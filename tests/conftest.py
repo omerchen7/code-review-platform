@@ -7,7 +7,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.db import Base
+from app.llm.base import BaseLLMProvider, LLMError, RuleVerdict
 from app.models import Scan
+from app.rules import Rule
 
 # ---------------------------------------------------------------------------
 # Shared DB fixture: fresh in-memory SQLite for every test that needs it
@@ -28,6 +30,24 @@ def db_session():
         session.close()
         Base.metadata.drop_all(bind=engine)
         engine.dispose()
+
+
+# ---------------------------------------------------------------------------
+# Fake LLM providers (no Ollama required)
+# ---------------------------------------------------------------------------
+
+class FakeLLMProvider(BaseLLMProvider):
+    """Always returns adheres=True for every rule without calling any LLM."""
+
+    async def evaluate_rule(self, code: str, rule: Rule) -> RuleVerdict:
+        return RuleVerdict(adheres=True, reason=f"Fake: rule '{rule.id}' passed.")
+
+
+class FailingLLMProvider(BaseLLMProvider):
+    """Always raises LLMError to simulate a provider failure."""
+
+    async def evaluate_rule(self, code: str, rule: Rule) -> RuleVerdict:
+        raise LLMError("Simulated LLM failure.")
 
 
 # ---------------------------------------------------------------------------
