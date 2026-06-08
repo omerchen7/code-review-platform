@@ -139,11 +139,33 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Code Review Platform",
     description=(
-        "Local POC for automatic LLM-based Python code review. "
-        "Runs predefined rules against uploaded source files using a local Ollama model."
+        "Local POC for automatic LLM-based Python code review.\n\n"
+        "Upload a `.py` file and the platform evaluates it against a set of "
+        "predefined rules using a local Ollama model. Results are stored in "
+        "SQLite for 24 hours and reused automatically when the same file, "
+        "ruleset, and model configuration are submitted again.\n\n"
+        "**Quick start:** `POST /scans` with a `.py` file → poll `GET /scans/{scan_id}` "
+        "until `status` is `completed`."
     ),
     version="0.1.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
     lifespan=lifespan,
 )
 
 app.include_router(router)
+
+
+@app.get(
+    "/",
+    include_in_schema=False,
+    summary="Root navigation",
+)
+def root() -> dict:
+    """Return basic API navigation links."""
+    return {
+        "name": "Code Review Platform",
+        "docs": "/docs",
+        "health": "/health",
+        "rules": "/rules",
+    }

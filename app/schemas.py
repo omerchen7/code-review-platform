@@ -12,9 +12,9 @@ from pydantic import BaseModel, ConfigDict, Field
 class SubmitScanResponse(BaseModel):
     """Returned immediately after a scan is accepted or a cache hit is found."""
 
-    scan_id: str
-    status: str
-    cached: bool
+    scan_id: str = Field(description="UUID of the created (or reused) scan.")
+    status: str = Field(description="Initial status: `pending` for new scans, `completed` for cache hits.")
+    cached: bool = Field(description="`true` if a prior result was reused; no new LLM calls were made.")
 
 
 # ---------------------------------------------------------------------------
@@ -24,10 +24,10 @@ class SubmitScanResponse(BaseModel):
 class RuleResultResponse(BaseModel):
     """The verdict for a single rule within a completed scan."""
 
-    rule_id: str
-    rule_name: str
-    adheres: bool
-    reason: str | None = None
+    rule_id: str = Field(description="Stable identifier for the rule (e.g. `meaningful_names`).")
+    rule_name: str = Field(description="Human-readable rule name.")
+    adheres: bool = Field(description="`true` if the code satisfies this rule, `false` otherwise.")
+    reason: str | None = Field(default=None, description="Brief explanation of the verdict from the LLM.")
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -44,14 +44,14 @@ class ScanResponse(BaseModel):
     rather than relying on from_attributes, so that renaming is explicit.
     """
 
-    scan_id: str
-    status: str
-    cached: bool
-    file_name: str
-    created_at: datetime
-    expires_at: datetime
-    error: str | None = None
-    results: list[RuleResultResponse] = Field(default_factory=list)
+    scan_id: str = Field(description="UUID of the scan.")
+    status: str = Field(description="One of: `pending`, `running`, `completed`, `failed`.")
+    cached: bool = Field(description="`true` when this response was served from a prior result.")
+    file_name: str = Field(description="Original filename of the uploaded source file.")
+    created_at: datetime = Field(description="UTC timestamp when the scan was created.")
+    expires_at: datetime = Field(description="UTC timestamp after which the result is no longer available (HTTP 410).")
+    error: str | None = Field(default=None, description="Error message if `status` is `failed`.")
+    results: list[RuleResultResponse] = Field(default_factory=list, description="Rule verdicts (populated once `status` is `completed`).")
 
 
 # ---------------------------------------------------------------------------
@@ -61,11 +61,11 @@ class ScanResponse(BaseModel):
 class RuleListItem(BaseModel):
     """A single rule as exposed by the GET /rules endpoint."""
 
-    id: str
-    name: str
-    version: str
-    description: str
-    order: int
+    id: str = Field(description="Stable rule identifier (matches `rule_id` in scan results).")
+    name: str = Field(description="Human-readable rule name.")
+    version: str = Field(description="Rule version; a change here invalidates cached results.")
+    description: str = Field(description="Plain-English description of what the rule checks.")
+    order: int = Field(description="Evaluation order (ascending). Rules run in this sequence.")
 
 
 class RuleListResponse(BaseModel):
@@ -82,11 +82,11 @@ class RuleListResponse(BaseModel):
 class HealthResponse(BaseModel):
     """Basic liveness response for GET /health."""
 
-    status: str
+    status: str = Field(description="Always `ok` while the process is running.")
 
 
 class OllamaHealthResponse(BaseModel):
     """Diagnostic response for GET /health/ollama."""
 
-    status: str
-    error: str | None = None
+    status: str = Field(description="`ok` if Ollama is reachable, `unreachable` otherwise.")
+    error: str | None = Field(default=None, description="Error detail when Ollama is unreachable.")

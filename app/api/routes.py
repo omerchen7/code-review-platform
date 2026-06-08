@@ -34,6 +34,11 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+# Tag descriptions are picked up by FastAPI and rendered in the Swagger sidebar.
+_TAG_SCANS = "Scans"
+_TAG_RULES = "Rules"
+_TAG_HEALTH = "Health"
+
 
 # ---------------------------------------------------------------------------
 # Dependency helpers — pull shared objects from app.state
@@ -59,7 +64,27 @@ def _utcnow() -> datetime:
 # POST /scans
 # ---------------------------------------------------------------------------
 
-@router.post("/scans", response_model=SubmitScanResponse, status_code=202)
+@router.post(
+    "/scans",
+    response_model=SubmitScanResponse,
+    status_code=202,
+    tags=[_TAG_SCANS],
+    summary="Submit a Python file for code review",
+    description=(
+        "Upload a `.py` source file. The platform validates it, checks for a cached "
+        "result, and — on a cache miss — starts a background scan against all active rules.\n\n"
+        "**Returns 202 in both cases** (new scan and cache hit). Check the `cached` flag "
+        "to know whether fresh LLM calls were made.\n\n"
+        "Poll `GET /scans/{scan_id}` until `status` is `completed` or `failed`.\n\n"
+        "**Error codes:**\n"
+        "- `400` — invalid file (not `.py`, empty, too large, non-UTF-8, or syntax error)\n"
+        "- `429` — all 5 parallel scan slots are occupied; retry later"
+    ),
+    responses={
+        400: {"description": "Invalid file upload"},
+        429: {"description": "Scan capacity full — retry when a slot is free"},
+    },
+)
 async def submit_scan(
     file: UploadFile,
     db: Session = Depends(get_db),
@@ -203,7 +228,23 @@ def _new_scan_id() -> str:
 # GET /scans/{scan_id}
 # ---------------------------------------------------------------------------
 
-@router.get("/scans/{scan_id}", response_model=ScanResponse)
+@router.get(
+    "/scans/{scan_id}",
+    response_model=ScanResponse,
+    tags=[_TAG_SCANS],
+    summary="Fetch scan status and results",
+    description=(
+        "Return the current state of a scan and, once complete, its rule verdicts.\n\n"
+        "**Status lifecycle:** `pending` → `running` → `completed` | `failed`\n\n"
+        "**Error codes:**\n"
+        "- `404` — `scan_id` not found\n"
+        "- `410` — scan existed but results have expired (older than 24 h)"
+    ),
+    responses={
+        404: {"description": "Scan not found"},
+        410: {"description": "Scan results have expired"},
+    },
+)
 def get_scan(
     scan_id: str,
     db: Session = Depends(get_db),
@@ -245,7 +286,18 @@ def get_scan(
 # GET /rules
 # ---------------------------------------------------------------------------
 
-@router.get("/rules", response_model=RuleListResponse)
+@router.get(
+    "/rules",
+    response_model=RuleListResponse,
+    tags=[_TAG_RULES],
+    summary="List active review rules",
+    description=(
+        "Return all currently enabled code-review rules in evaluation order.\n\n"
+        "Prompt templates are intentionally excluded from this response. "
+        "The `version` field changes whenever a rule's logic is updated, "
+        "which automatically invalidates cached results for that ruleset."
+    ),
+)
 def list_rules(
     rules: list[Rule] = Depends(_get_active_rules),
 ) -> RuleListResponse:
@@ -268,7 +320,17 @@ def list_rules(
 # GET /health
 # ---------------------------------------------------------------------------
 
-@router.get("/health", response_model=HealthResponse)
+@router.get(
+    "/health",
+    response_model=HealthResponse,
+    tags=[_TAG_HEALTH],
+    summary="Application liveness check",
+    description=(
+        "Returns `{\"status\": \"ok\"}` as long as the process is up. "
+        "Does **not** probe Ollama or the database — use `GET /health/ollama` "
+        "for a full dependency check."
+    ),
+)
 def health() -> HealthResponse:
     """Simple process liveness check. Always returns 200 if the app is running."""
     return HealthResponse(status="ok")
@@ -278,7 +340,21 @@ def health() -> HealthResponse:
 # GET /health/ollama
 # ---------------------------------------------------------------------------
 
-@router.get("/health/ollama", response_model=OllamaHealthResponse)
+@router.get(
+    "/health/ollama",
+    response_model=OllamaHealthResponse,
+    tags=[_TAG_HEALTH],
+    summary="Ollama reachability probe",
+    description=(
+        "Probe the configured Ollama server (`LLM_BASE_URL/api/tags`) with a 5-second timeout.\n\n"
+        "- **200** — Ollama is reachable and scans can be processed.\n"
+        "- **503** — Ollama is unreachable; submitted scans will fail until it comes back up.\n\n"
+        "This check is independent of `GET /health` (process liveness)."
+    ),
+    responses={
+        503: {"description": "Ollama server is unreachable"},
+    },
+)
 async def health_ollama(
     settings: Settings = Depends(get_settings),
 ) -> OllamaHealthResponse:
