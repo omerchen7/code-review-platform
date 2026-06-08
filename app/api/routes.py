@@ -328,7 +328,7 @@ def list_rules(
     description=(
         "Returns `{\"status\": \"ok\"}` as long as the process is up. "
         "Does **not** probe Ollama or the database — use `GET /health/ollama` "
-        "for a full dependency check."
+        "for an LLM dependency check."
     ),
 )
 def health() -> HealthResponse:
