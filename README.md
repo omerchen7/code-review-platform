@@ -83,23 +83,31 @@ GET /scans/{id}  ->  return Scan + RuleResults
 
 ### Prerequisites 📋
 
+- Git
 - Python 3.11 or later
 - [Ollama](https://ollama.com) installed and running locally
 
-### 1. Clone and create a virtual environment 🐍
+### 1. Clone the repository 📥
+
+```powershell
+git clone https://github.com/<your-username>/code-review-platform.git
+cd code-review-platform
+```
+
+### 2. Create and activate a virtual environment 🐍
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-### 2. Install dependencies 📦
+### 3. Install dependencies 📦
 
 ```powershell
 pip install -e ".[dev]"
 ```
 
-### 3. Install and start Ollama 🦙
+### 4. Install and start Ollama 🦙
 
 Download from [ollama.com](https://ollama.com) and follow the installer.
 Verify it is running:
@@ -108,7 +116,7 @@ Verify it is running:
 ollama list
 ```
 
-### 4. Pull the default model 🧠
+### 5. Pull the default model 🧠
 
 ```powershell
 ollama pull qwen2.5-coder:7b
@@ -121,9 +129,15 @@ ollama pull qwen2.5-coder:3b
 ollama pull llama3.2:3b
 ```
 
-Update `LLM_MODEL` in `.env` if you choose a different model.
+If you choose another model, update:
 
-### 5. Configure environment (optional) 🔧
+```env
+LLM_MODEL=<your-model-name>
+```
+
+in your `.env` file.
+
+### 6. Configure environment (optional) 🔧
 
 ```powershell
 copy .env.example .env
@@ -137,7 +151,7 @@ Edit `.env` only if you need a different model, base URL, or TTL.
 ## 5. Running the App 🚀
 
 ```powershell
-uvicorn app.main:app --reload
+python -m uvicorn app.main:app --reload
 ```
 
 > **Important:** Always run with a **single worker** (the default).
