@@ -44,7 +44,7 @@ Everything runs locally. No cloud assets, no authentication, no message queues.
 | Up to 5 parallel scans | `ConcurrencyManager` with a non-blocking `try_acquire()` gate |
 | 6th scan rejected immediately | `try_acquire()` returns `False` — HTTP 429, no queuing |
 | Local SQLite persistence | SQLAlchemy with `sqlite:///./code_review.db` |
-| 24-hour result retention / expiration | `expires_at` column; expired rows return HTTP 410 and are not reused |
+| 24-hour result retention / expiration | `expires_at` column; expired rows return HTTP 410, are not reused for cache, and are deleted by an hourly background cleanup task |
 | Result reuse / cache | SHA-256 cache key over `(content_hash, ruleset_hash, provider, model, temperature)` |
 | Local LLM only — Ollama | `OllamaProvider` calls `http://localhost:11434/api/generate` via `httpx` |
 | Configurable provider / model | `LLM_PROVIDER`, `LLM_BASE_URL`, `LLM_MODEL`, `LLM_TEMPERATURE` in `.env` |
@@ -291,7 +291,7 @@ HTTP 429 Too Many Requests
 Tests use fake LLM providers and an in-memory SQLite database.
 **Ollama does not need to be running.**
 
-```powershell
+```bash
 # Run the full test suite
 pytest
 
