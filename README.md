@@ -346,11 +346,22 @@ The suite covers:
 
 ## 10. AI Usage 🤖
 
-AI tools (a large language model assistant in the Cursor IDE) were used throughout this project as an engineering assistant:
+AI tools were used throughout this project as engineering assistants to support design, implementation, and review.
 
-- **Architecture planning** — proposing and critiquing the project structure, API design, database schema, caching strategy, and concurrency approach before any code was written.
-- **Incremental implementation** — generating each module step by step with explicit requirements and constraints provided per step, reviewed and accepted or corrected before proceeding.
-- **Code review** — applying targeted corrections per step (nullable fields, mutable defaults, canonical JSON hashing, encoding fixes, import cleanup, resource release guarantees).
-- **Test authoring** — writing the unit and integration test suite, including identifying the `StaticPool` issue with in-memory SQLite across thread boundaries and the `asyncio` background-task polling pattern.
+- **ChatGPT** — architecture discussions, design refinements, trade-off analysis, structuring the development workflow, and translating requirements into clear implementation steps.
+- **Cursor** — IDE-based implementation assistance, incremental development, refactoring, debugging, and test authoring.
 
-The full prompt and conversation transcript is included separately with this submission as required.
+The development workflow included:
+
+- **Architecture planning** — evaluating technology choices and discussing project structure, API design, database schema, caching strategy, asynchronous execution, and concurrency handling before implementation.
+
+- **Incremental implementation** — developing the system step by step, with each component reviewed and refined before moving to the next one.
+
+- **Code review and refinement** — identifying and fixing implementation details such as nullable fields, mutable defaults, canonical JSON hashing, encoding handling, import cleanup, and resource management.
+
+- **Testing** — creating unit and integration tests, including handling issues such as SQLite in-memory behavior across thread boundaries (`StaticPool`) and asynchronous background task testing patterns.
+
+The full AI conversation transcripts requested by the assignment are included:
+
+- [`docs/ai/chatgpt_conversation.md`](docs/ai/chatgpt_conversation.md) — architecture planning, design discussions, and technical trade-offs.
+- [`docs/ai/cursor_conversation.md`](docs/ai/cursor_conversation.md) — implementation assistance, code review iterations, testing, and final refinements.
