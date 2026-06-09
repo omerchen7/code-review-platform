@@ -90,7 +90,7 @@ GET /scans/{id}  ->  return Scan + RuleResults
 ### 1. Clone the repository 📥
 
 ```bash
-git clone https://github.com/<your-username>/code-review-platform.git
+git clone https://github.com/omerchen7/code-review-platform.git
 cd code-review-platform
 ```
 
