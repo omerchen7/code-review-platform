@@ -89,21 +89,30 @@ GET /scans/{id}  ->  return Scan + RuleResults
 
 ### 1. Clone the repository 📥
 
-```powershell
+```bash
 git clone https://github.com/<your-username>/code-review-platform.git
 cd code-review-platform
 ```
 
 ### 2. Create and activate a virtual environment 🐍
 
+#### Windows (PowerShell)
+
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
+#### macOS / Linux
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
 ### 3. Install dependencies 📦
 
-```powershell
+```bash
 pip install -e ".[dev]"
 ```
 
@@ -139,8 +148,16 @@ in your `.env` file.
 
 ### 6. Configure environment (optional) 🔧
 
+#### Windows (PowerShell)
+
 ```powershell
 copy .env.example .env
+```
+
+#### macOS / Linux
+
+```bash
+cp .env.example .env
 ```
 
 The defaults in `.env.example` work out of the box with a local Ollama installation.
