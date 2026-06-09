@@ -116,24 +116,33 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-### 4. Install and start Ollama 🦙
+### 4. Install and verify Ollama 🦙
 
 Download from [ollama.com](https://ollama.com) and follow the installer.
-Verify it is running:
 
-```powershell
+Make sure the local Ollama server is running:
+
+```bash
 ollama list
 ```
 
+If this command fails, start Ollama manually:
+
+```bash
+ollama serve
+```
+
+On Windows/macOS, the Ollama desktop app usually starts the local server automatically.
+
 ### 5. Pull the default model 🧠
 
-```powershell
+```bash
 ollama pull qwen2.5-coder:7b
 ```
 
 Lighter alternatives if hardware is constrained:
 
-```powershell
+```bash
 ollama pull qwen2.5-coder:3b
 ollama pull llama3.2:3b
 ```
