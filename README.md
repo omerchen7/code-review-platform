@@ -176,7 +176,7 @@ Edit `.env` only if you need a different model, base URL, or TTL.
 
 ## 5. Running the App 🚀
 
-```powershell
+```bash
 python -m uvicorn app.main:app --reload
 ```
 
