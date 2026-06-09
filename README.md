@@ -1,4 +1,4 @@
-# Code Review Platform — Local POC
+# Code Review Platform — Local POC 🧠
 
 A local, asynchronous, LLM-powered Python code review API. Upload a `.py` file, get back structured rule verdicts produced by a local Ollama model. Everything runs locally with no cloud services or remote model provider.
 
@@ -6,20 +6,20 @@ A local, asynchronous, LLM-powered Python code review API. Upload a `.py` file, 
 
 ## Table of Contents
 
-1. [Project Overview](#1-project-overview)
-2. [Requirements Coverage](#2-requirements-coverage)
-3. [Architecture](#3-architecture)
-4. [Setup](#4-setup)
-5. [Running the App](#5-running-the-app)
-6. [API Examples](#6-api-examples)
-7. [Running Tests](#7-running-tests)
-8. [Design Decisions](#8-design-decisions)
-9. [Known Limitations and Future Improvements](#9-known-limitations-and-future-improvements)
-10. [AI Usage](#10-ai-usage)
+1. [Project Overview 🧭](#1-project-overview)
+2. [Requirements Coverage ✅](#2-requirements-coverage)
+3. [Architecture 🏗️](#3-architecture)
+4. [Setup ⚙️](#4-setup)
+5. [Running the App 🚀](#5-running-the-app)
+6. [API Examples 🔌](#6-api-examples)
+7. [Running Tests 🧪](#7-running-tests)
+8. [Design Decisions 💡](#8-design-decisions)
+9. [Known Limitations and Future Improvements ⚠️](#9-known-limitations-and-future-improvements)
+10. [AI Usage 🤖](#10-ai-usage)
 
 ---
 
-## 1. Project Overview
+## 1. Project Overview 🧭
 
 This is a **proof-of-concept** code review platform that:
 
@@ -35,7 +35,7 @@ Everything runs locally. No cloud assets, no authentication, no message queues.
 
 ---
 
-## 2. Requirements Coverage
+## 2. Requirements Coverage ✅
 
 | Requirement | Implementation |
 |---|---|
@@ -51,7 +51,7 @@ Everything runs locally. No cloud assets, no authentication, no message queues.
 
 ---
 
-## 3. Architecture
+## 3. Architecture 🏗️
 
 ```
 POST /scans  ->  validate  ->  cache lookup
@@ -79,27 +79,27 @@ GET /scans/{id}  ->  return Scan + RuleResults
 
 ---
 
-## 4. Setup
+## 4. Setup ⚙️
 
-### Prerequisites
+### Prerequisites 📋
 
 - Python 3.11 or later
 - [Ollama](https://ollama.com) installed and running locally
 
-### 1. Clone and create a virtual environment
+### 1. Clone and create a virtual environment 🐍
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-### 2. Install dependencies
+### 2. Install dependencies 📦
 
 ```powershell
 pip install -e ".[dev]"
 ```
 
-### 3. Install and start Ollama
+### 3. Install and start Ollama 🦙
 
 Download from [ollama.com](https://ollama.com) and follow the installer.
 Verify it is running:
@@ -108,7 +108,7 @@ Verify it is running:
 ollama list
 ```
 
-### 4. Pull the default model
+### 4. Pull the default model 🧠
 
 ```powershell
 ollama pull qwen2.5-coder:7b
@@ -123,7 +123,7 @@ ollama pull llama3.2:3b
 
 Update `LLM_MODEL` in `.env` if you choose a different model.
 
-### 5. Configure environment (optional)
+### 5. Configure environment (optional) 🔧
 
 ```powershell
 copy .env.example .env
@@ -134,7 +134,7 @@ Edit `.env` only if you need a different model, base URL, or TTL.
 
 ---
 
-## 5. Running the App
+## 5. Running the App 🚀
 
 ```powershell
 uvicorn app.main:app --reload
@@ -152,9 +152,9 @@ uvicorn app.main:app --reload
 
 ---
 
-## 6. API Examples
+## 6. API Examples 🔌
 
-### Submit a scan
+### Submit a scan 📤
 
 ```bash
 curl -X POST http://localhost:8000/scans \
@@ -173,7 +173,7 @@ Response (`202 Accepted`):
 
 If an identical file was already scanned with the same ruleset and model, `"cached": true` is returned and no new LLM calls are made. The scan_id will point to the existing result.
 
-### Fetch results
+### Fetch results 📥
 
 ```bash
 curl http://localhost:8000/scans/3fa85f64-5717-4562-b3fc-2c963f66afa6
@@ -215,13 +215,13 @@ Response (`200 OK`) once the scan completes:
 | `404` | Unknown `scan_id` |
 | `410 Gone` | Scan results have expired (older than 24 h) |
 
-### List active rules
+### List active rules 📜
 
 ```bash
 curl http://localhost:8000/rules
 ```
 
-### Health checks
+### Health checks ❤️
 
 ```bash
 # Application liveness — always 200 while the process is up
@@ -231,7 +231,7 @@ curl http://localhost:8000/health
 curl http://localhost:8000/health/ollama
 ```
 
-### Capacity limit
+### Capacity limit 🚦
 
 When 5 scans are already running, the next `POST /scans` returns:
 
@@ -247,7 +247,7 @@ HTTP 429 Too Many Requests
 
 ---
 
-## 7. Running Tests
+## 7. Running Tests 🧪
 
 Tests use fake LLM providers and an in-memory SQLite database.
 **Ollama does not need to be running.**
@@ -271,7 +271,7 @@ The suite covers:
 
 ---
 
-## 8. Design Decisions
+## 8. Design Decisions 💡
 
 **FastAPI** — Native `async/await` support makes it natural to launch background tasks with `asyncio.create_task`. The automatic OpenAPI docs at `/docs` let a reviewer explore the API without extra tooling.
 
@@ -291,7 +291,7 @@ The suite covers:
 
 ---
 
-## 9. Known Limitations and Future Improvements
+## 9. Known Limitations and Future Improvements ⚠️
 
 | Limitation | Notes |
 |---|---|
@@ -305,7 +305,7 @@ The suite covers:
 
 ---
 
-## 10. AI Usage
+## 10. AI Usage 🤖
 
 AI tools (a large language model assistant in the Cursor IDE) were used throughout this project as an engineering assistant:
 
