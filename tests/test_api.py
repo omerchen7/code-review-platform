@@ -220,7 +220,7 @@ async def test_get_scan_returns_completed_with_results(app_state):
 
     assert data["status"] == "completed"
     assert data["scan_id"] == scan_id
-    assert data["cached"] is False
+    assert "cached" not in data
     # Two rules from rules.yaml → two results
     assert len(data["results"]) == 2
     for result in data["results"]:

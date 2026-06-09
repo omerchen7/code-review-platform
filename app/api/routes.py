@@ -273,7 +273,6 @@ def get_scan(
     return ScanResponse(
         scan_id=scan.id,
         status=scan.status,
-        cached=False,
         file_name=scan.file_name,
         created_at=scan.created_at,
         expires_at=scan.expires_at,

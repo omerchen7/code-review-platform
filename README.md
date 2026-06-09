@@ -185,7 +185,6 @@ Response (`200 OK`) once the scan completes:
 {
   "scan_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "status": "completed",
-  "cached": false,
   "file_name": "your_script.py",
   "created_at": "2026-06-08T10:00:00",
   "expires_at": "2026-06-09T10:00:00",

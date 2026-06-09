@@ -37,16 +37,18 @@ class ScanResponse(BaseModel):
 
     This is NOT a 1:1 ORM mapping:
     - The ORM Scan model uses ``id``; the API exposes it as ``scan_id``.
-    - ``cached`` has no ORM column — it is computed by the route handler and
-      injected when constructing this response.
 
     The route builds this manually (e.g. ScanResponse(scan_id=scan.id, ...))
     rather than relying on from_attributes, so that renaming is explicit.
+
+    The ``cached`` flag is intentionally absent here. It is meaningful only for
+    ``POST /scans`` (which tells the caller whether a fresh scan was started or
+    an existing result was reused). ``GET /scans/{scan_id}`` returns the stored
+    scan resource itself — cache semantics belong to the submit response.
     """
 
     scan_id: str = Field(description="UUID of the scan.")
     status: str = Field(description="One of: `pending`, `running`, `completed`, `failed`.")
-    cached: bool = Field(description="`true` when this response was served from a prior result.")
     file_name: str = Field(description="Original filename of the uploaded source file.")
     created_at: datetime = Field(description="UTC timestamp when the scan was created.")
     expires_at: datetime = Field(description="UTC timestamp after which the result is no longer available (HTTP 410).")
